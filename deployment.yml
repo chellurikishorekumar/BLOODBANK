@@ -1,0 +1,40 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bankapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+
+    spec:
+      containers:
+        - name: app-cont
+          image: kishorech48/bloodbank:app
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: devopsdb
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  type: NodePort
+  selector:
+    app: bank
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30001
+

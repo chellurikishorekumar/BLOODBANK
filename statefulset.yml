@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bank-db
+spec:
+  serviceName: "mysql"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+
+    spec:
+      containers:
+        - name: dbcont
+          image: kishorech48/bloodbank:db
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: www
+              mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+    - metadata:
+        name: www
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devopsdb
+spec:
+  clusterIP: None
+  selector:
+    app: db
+  ports:
+    - port: 3306
+      targetPort: 3306
